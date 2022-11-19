@@ -5,6 +5,7 @@ import argparse
 import torch.utils.tensorboard
 from torchvision import *
 import pickle
+import sys
 from arabiner.utils.data import get_dataloaders, parse_conll_files
 from arabiner.utils.helpers import logging_config, load_object, make_output_dirs, set_seed
 
@@ -142,6 +143,16 @@ def parse_args():
 
 
 def main(args):
+    logger = logging.getLogger('')
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(os.path.join(args.output_path, "train.log"))
+    sh = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
+    fh.setFormatter(formatter)
+    sh.setFormatter(formatter)
+    logger.addHandler(fh)
+    logger.addHandler(sh)
+
     make_output_dirs(
         args.output_path,
         subdirs=("tensorboard", "checkpoints"),
@@ -151,7 +162,7 @@ def main(args):
     # Set the seed for randomization
     set_seed(args.seed)
 
-    logging_config(os.path.join(args.output_path, "train.log"))
+    #logging_config(os.path.join(args.output_path, "train.log"))
     summary_writer = torch.utils.tensorboard.SummaryWriter(
         os.path.join(args.output_path, "tensorboard")
     )
